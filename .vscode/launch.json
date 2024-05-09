@@ -6,7 +6,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/index.js",
             "console": "integratedTerminal",
-            "args": []
+            "args": ["jira_clone/client/src Jira_Clone_React_Project"]
 
         }
     ]

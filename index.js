@@ -9,7 +9,8 @@ const { ChatGPTAutomation, ChatGPTSession } = require('./gpt_selenium')
 const { transformFromAstSync } = babel
 const types = require('@babel/types');
 const { exec } = require('child_process');
-const os = require('os')
+const os = require('os');
+const { readFile } = require('fs');
 const inputDir = './chat_application/src'; // Adjust the path to your source files
 const outputFile = './chat_application/src/allCode.js';
 
@@ -102,17 +103,35 @@ async function* parseFiles(imports, orderedFiles) {
         });
 
         let generatedCodes = []; // Array to store generated codes
-
+        const imports = []
+        const declarations = []
         // Traverse the AST here if needed to manipulate or analyze before output
         traverse(ast, {
             enter(path) {
-                if (path.node.type === 'FunctionDeclaration' || path.node.type === 'VariableDeclaration') {
-                    const { code: generatedCode } = generator(path.node);
-                    generatedCodes.push(generatedCode); // Collect generated codes
+                if (path.node.type === 'Program') {
+                    const imports = []
+                    path.node.body.map(obj => {
+                        const { code: generatedCode } = generator(obj.node);
+                         // Collect generated codes
+                        if(obj.node.type == 'ImportDeclaration'){
+                            imports.push(generatedCode)
+                        }else if (obj.node.type == 'ExportNamedDeclaration'){
+
+                        } else if (obj.node.type == 'ExportDefaultDeclaration'){
+
+                        }
+                        else {
+                            declarations.push(generatedCode)
+                        }
+                        
+                    })
+                    
 
                 }
             }
         });
+        generatedCodes.push(imports.join("\n"))
+        generatedCodes.push(...declarations)
         for (const generatedCode of generatedCodes) {
             yield generatedCode;
         }
@@ -145,23 +164,12 @@ async function loadConfig() {
 }
 
 async function main() {
-    const repo = args[2] ? args[2] : "https://github.com/spylix/vanilla-node-server.git"
+    const repo = args[2] ? args[2] : "https://github.com/adrianhajdin/project_chat_application/blob/master/client/src/index.js"
     const repo_folder = getDirectoryNameFromGitUrl(repo)
     console.log(repo_folder)
-    const inputDir = path.join(os.homedir(), repo_folder)
-    exec(`git clone ${repo} ${inputDir}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            goThroughCode(inputDir, args[3])
-            return;
-        }
-
-        goThroughCode(inputDir, args[3] ? args[3] : "Learn_React")
-
-        // You can continue your logic here if further processing is needed
-        // For example, you might want to read files or perform other operations
-    });
-
+    const inputDir = path.join(os.homedir(), args[2])
+    
+    goThroughCode(inputDir, args[3])
 }
 async function goThroughCode(inputDir, chatName = "Learn_React") {
 
@@ -196,7 +204,7 @@ async function goThroughCode(inputDir, chatName = "Learn_React") {
 
     
 
-    await gptSession.ask({ value: promptConfig['start'] })
+    // await gptSession.ask({ value: promptConfig['start'] })
 
     const readline = require('readline').createInterface({
         input: process.stdin,
@@ -209,15 +217,34 @@ async function goThroughCode(inputDir, chatName = "Learn_React") {
             resolve(answer);
         });
     });
-    let piece = await cur.next()
+    const saved = JSON.parse((await fs.readFile("last_stopped.json")))
+    const last_stopped = saved[chatName]?saved[chatName] : 1
+    const full_out_file = `${chatName}.js`
+    if(!fs.existsSync(full_out_file)){
+        fs.writeFileSync(full_out_file,"// Learning \n")
+        
+    }
+    let current_counter = 1
+    let piece
+    while(current_counter <= last_stopped){
+        piece = await cur.next()
+        current_counter++
+    }
     let answer = await getAnswer("Next?")
-    console.log(typeof piece.value)
+        await fs.appendFile(full_out_file,`${piece.value}\n`)
+        await gptSession.ask({ value: piece.value })
+        saved[chatName] = current_counter+1
+        await fs.writeFile("last_stopped.json", JSON.stringify(saved))
 
-    let askPrompt = await gptSession.ask({ value: piece.value })
     while (!piece.done) {
         piece = await cur.next()
         answer = await getAnswer("Next?")
-        askPrompt = await gptSession.ask({ value: piece.value })
+        await fs.appendFile(`${chatName}.js`,`${piece.value}\n`)
+        
+            await gptSession.ask({ value: piece.value })
+            saved[chatName] = current_counter+1
+            await fs.writeFile("last_stopped.json", JSON.stringify(saved))
+        current_counter++
         
     }   
 
