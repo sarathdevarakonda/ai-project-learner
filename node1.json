@@ -1,0 +1,36 @@
+[
+    {
+        "nodeId": "a9506018922f0594eb080551088c99acf5cc8eec9027109a4f760e384bbf1a85",
+        "label": "Package",
+        "directory": ".",
+        "packageName": "lerna-workspace",
+        "version": "^1.0.0"
+    },
+    {
+        "nodeId": "5d6be9c5f500980e7b111c31a95ed5ceef301d00a3c90e32b5abf8cf19d6038e",
+        "label": "Package",
+        "directory": "packages/project-a",
+        "packageName": "project-a",
+        "version": "^0.0.1"
+    },
+    {
+        "nodeId": "d3d5f2702a91ee19bad77457e8ed3e384767b8b68e51c4af7260767e9c84bb91",
+        "label": "Package",
+        "external": true,
+        "version": "^4.17.11"
+    },
+    {
+        "nodeId": "b759b6991529ca256644fcc1d4f1242dd0a24b98b214da401fe32d24d7ed07be",
+        "label": "Package",
+        "directory": "packages/project-b",
+        "packageName": "project-b",
+        "version": "^0.0.1"
+    },
+    {
+        "nodeId": "9d807fc2d37e1b8da18588534e65e380b3422f4f08b94068f365a42c3ae56b69",
+        "label": "Package",
+        "directory": "packages/project-c",
+        "packageName": "project-c",
+        "version": "^0.0.1"
+    }
+]

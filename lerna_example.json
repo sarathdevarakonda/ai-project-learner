@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "id": "lerna-workspace",
+      "label": "Package",
+      "directory": ""
+    },
+    {
+      "id": "project-a",
+      "label": "Package",
+      "directory": "packages/project-a"
+    },
+    {
+      "id": "lodash",
+      "label": "Package",
+      "external": true
+    },
+    {
+      "id": "project-b",
+      "label": "Package",
+      "directory": "packages/project-b"
+    },
+    {
+      "id": "project-c",
+      "label": "Package",
+      "directory": "packages/project-c"
+    }
+  ],
+  "edges": [
+    {
+      "source": "project-a",
+      "target": "lodash",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "source": "project-b",
+      "target": "project-a",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "source": "project-c",
+      "target": "lodash",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "source": "project-c",
+      "target": "project-a",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "source": "project-c",
+      "target": "project-b",
+      "type": "DEPENDS_ON"
+    }
+  ]
+}

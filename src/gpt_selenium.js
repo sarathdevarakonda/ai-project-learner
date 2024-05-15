@@ -1,11 +1,13 @@
-require('dotenv').config();
-const { Builder, By, Key } = require('selenium-webdriver');
-const http = require('http');
-const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const { Options } = require('selenium-webdriver/chrome');
-const { spawn } = require('child_process');
+import dotenv from 'dotenv';
+dotenv.config();
+import { Builder, By, Key } from 'selenium-webdriver';
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import chrome from 'selenium-webdriver/chrome.js';
+const { Options } = chrome;
+import { spawn } from 'child_process';
+
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -164,10 +166,11 @@ async sendPromptToChatGPT(prompt) {
 
   async waitForHumanVerification() {
     console.log("You need to manually complete the log-in or the human verification if required.");
-    const readline = require('readline').createInterface({
+    const readline = (await import('readline')).createInterface({
       input: process.stdin,
       output: process.stdout
-    });
+  });
+  
 
     // Function to handle the question as a Promise
     const getAnswer = (question) => new Promise((resolve) => {
@@ -234,8 +237,5 @@ class ChatGPTSession {
 
 // Example of using the class
 
-module.exports = {
-    ChatGPTAutomation,
-    ChatGPTSession
-};
+export { ChatGPTAutomation, ChatGPTSession }
 
